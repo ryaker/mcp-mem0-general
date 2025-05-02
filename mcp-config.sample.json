@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "mem0-memory-general": {
+      "command": "/path/to/your/python/env/bin/mcp-mem0-server",
+      "args": [],
+      "env": {
+        "MEM0_API_KEY": "${MEM0_API_KEY}",
+        "MEM0_GRAPH_PROVIDER": "${MEM0_GRAPH_PROVIDER}",
+        "MEM0_GRAPH_URL": "${MEM0_GRAPH_URL}",
+        "MEM0_GRAPH_USERNAME": "${MEM0_GRAPH_USERNAME}",
+        "MEM0_GRAPH_PASSWORD": "${MEM0_GRAPH_PASSWORD}"
+      },
+      "notes": "Example configuration assuming client supports env var substitution. Replace command path. For Claude Desktop, use absolute path and embed actual values in 'env' as needed."
+    }
+  }
+} 

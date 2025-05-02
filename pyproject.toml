@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-mem0-general"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "mem0ai[neo4j]>=0.1.21",
+    "fastmcp>=1.0.0",
+    "python-dotenv",
+    "openai>=1.0.0,<2.0.0",
+    "rank-bm25",
+    "certifi",
+]
+# Optional: Add description, authors etc.
+description = "MCP Server for general mem0 memory access"
+authors = [
+    { name="Your Name", email="your@email.com" }, # Add your details
+]
+
+# Define scripts as a separate table
+[project.scripts]
+mcp-mem0-server = "main:start_server"
+
+[tool.hatch.build.targets.wheel]
+# Define what constitutes the package to be installed
+# For a single file, we might need to adjust this slightly.
+# Let's assume main.py acts as the package content for now.
+# Check hatch docs if install fails. We need to make sure `main.py`
+# is importable after installation.
+# A better structure would be src/mcp_mem0_general/main.py
+# and reference packages = ["src/mcp_mem0_general"]
+# For now, let's try including the module directly:
+include = ["/main.py"]
+
+[tool.uv.sources]
+mem0-mcp = { path = ".", editable = true }
+
+# Remove the old dependencies section under [tool.uv]
+# // ... existing code ... NO - this section should be removed entirely
+# [tool.uv.dependencies]
+# mem0ai = ">=0.1.21"
+# fastmcp = ">=1.0.0" # Assuming v1 or later, adjust if needed
+# python-dotenv = "*" 
