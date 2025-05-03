@@ -1,129 +1,102 @@
-# Mem0 MCP Server 🧠
+# Mem0 MCP Server
 
-An implementation of the [Model Context Protocol](https://github.com/anthropics/model-context-protocol) for [Mem0.ai](https://mem0.ai) persistent memory.
+A Model Context Protocol (MCP) server for integrating AI assistants with Mem0.ai's persistent memory system.
 
 ## Overview
 
-This MCP server provides a bridge between AI assistants (Claude, ChatGPT, etc.) and Mem0.ai's persistent memory system. It allows AI assistants to:
+This server provides MCP-compatible tools that let any compatible AI assistant access and manage persistent memories stored in Mem0. It acts as a bridge between AI models and the Mem0 memory system, enabling assistants to:
 
-1. Store important information persistently across sessions
-2. Retrieve relevant memories based on context
-3. Build a knowledge graph of connected information
-4. Organize memories into cognitive-inspired structures
+- Store and retrieve memories
+- Search memories with semantic similarity
+- Manage different memory types (episodic, semantic, procedural)
+- Utilize short-term memory for conversation context
+- Apply selective memory patterns
+- Create knowledge graphs from memories
 
-## Features
+## Project Structure
 
-- **Basic Memory Operations**: Add, search, retrieve, update, and delete memories
-- **Specialized Memory Types**:
-  - Short-term (conversation, working, attention context)
-  - Long-term (episodic, semantic, procedural)
-- **Advanced Features**:
-  - Custom memory categories
-  - Selective memory with includes/excludes controls
-  - Custom memory processing instructions
-  - Knowledge graph relationship retrieval
-  - Memory quality feedback mechanism
+The project has been refactored from a monolithic design to a modular structure:
 
-## Installation
+```
+mem0_mcp_server/
+├── core/                   # Core functionality
+│   ├── client.py           # Mem0 client initialization 
+│   ├── logging.py          # Logging configuration
+│   └── server.py           # MCP server setup
+├── operations/             # Basic memory operations
+│   └── basic.py            # Add, search, get, delete, update
+├── memory_types/           # Specialized memory implementations
+│   ├── short_term.py       # Conversation, working, attention
+│   └── specialized.py      # Episodic, semantic, procedural
+└── advanced/               # Advanced features
+    ├── features.py         # Categories, instructions, graph, feedback
+    └── selective.py        # Pattern-based memory filtering
 
-### Prerequisites
+app.py                      # Main entry point
+```
 
-- Python 3.9+
-- Mem0.ai API key
-- [Optional] Neo4j database for graph capabilities
+## Getting Started
 
-### Setup
+### Setting up in Cursor or Claude Desktop
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/mcp-mem0-general.git
-   cd mcp-mem0-general
-   ```
+1. Install the package:
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install mcp-mem0-server
+```
 
-3. Create a configuration file:
-   ```bash
-   cp mcp-config.sample.json mcp-config.json
-   ```
+2. Add the following configuration to your MCP configuration file:
 
-4. Add your Mem0.ai API key to the configuration file or set it as an environment variable:
-   ```bash
-   export MEM0_API_KEY="your-mem0-api-key"
-   ```
+For Cursor, add this to `~/.cursor/mcp.json`:
+```json
+"mem0-memory-general": {
+  "command": "mcp-mem0-server",
+  "args": [],
+  "env": {
+    "MEM0_API_KEY": "your-mem0-api-key-here"
+  }
+}
+```
+
+For Claude Desktop, add a similar configuration in your settings.
+
+3. Restart Cursor or Claude Desktop to apply the changes.
+
+## Memory Types
+
+The server supports different memory types organized by duration and function:
+
+### Short-Term Memories
+- **Conversation Memory**: Recall of recent message exchanges
+- **Working Memory**: Temporary information being actively used 
+- **Attention Memory**: Information currently in focus
+
+### Long-Term Memories
+- **Episodic Memory**: Specific events and experiences
+- **Semantic Memory**: Facts, concepts, and knowledge
+- **Procedural Memory**: Skills and how-to information
+
+## Advanced Features
+
+- **Custom Categories**: Define and manage your own memory categories
+- **Memory Instructions**: Set guidelines for how memories should be processed
+- **Graph Relations**: Access knowledge graph relationships between entities
+- **Selective Memory**: Filter text with include/exclude patterns before storing
+- **Feedback Mechanism**: Provide feedback on memory quality
 
 ## Usage
 
-### Starting the Server
+All memories in the system use "richard_yaker" as the default user_id.
 
-```bash
-python main.py
-```
-
-This will start the MCP server on http://localhost:8000 by default.
-
-### Connecting to the Server
-
-In a Claude, ChatGPT, or other MCP-compatible client, add the server URL:
-```
-http://localhost:8000
-```
-
-The server provides the following tools that will be available to the AI:
-
-```
-mem0_add_memory
-mem0_search_memory
-mem0_get_all_memories
-mem0_get_memory_by_id
-mem0_delete_memory
-mem0_update_memory
-...and many more
-```
-
-See the [documentation](./docs/README.md) for details on all available tools.
+For detailed usage examples, see the [USAGE_GUIDE.md](USAGE_GUIDE.md).
 
 ## Documentation
 
-Comprehensive documentation is available in the [docs directory](./docs/):
-
-- [Getting Started Guide](./docs/getting-started.md)
-- [Complete API Reference](./docs/api-reference.md) 
-- [Memory Types Guide](./docs/memory-types.md)
-- [Advanced Features](./docs/advanced-features.md)
-- [Tutorial Collection](./docs/tutorials/)
-
-### Loading Documentation into Memory
-
-For a better experience, you can load the documentation directly into your Mem0 instance:
-
-```bash
-python scripts/load_docs.py
-```
-
-Once loaded, you can simply ask the AI assistant to:
-
-```
-Retrieve memory ID 76100ac4-896e-488b-90ad-036c0dfaaa80 using mem0_get_memory_by_id. 
-Display only the content of the memory found, then wait for further instructions.
-```
-
-This will load the complete Mem0 usage guide directly in your chat. You can also search for specific tutorials.
-
-## Advanced Configuration
-
-See [Configuration Guide](./docs/configuration.md) for details on:
-- Custom memory categories
-- Memory extraction instructions
-- Graph database integration
-- Security settings
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+- [Getting Started](docs/getting-started.md)
+- [API Reference](docs/api-reference.md)
+- [Memory Types](docs/memory-types.md)
+- [Advanced Features](docs/advanced-features.md)
+- [Configuration](docs/configuration.md)
 
 ## License
 

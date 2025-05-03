@@ -5,7 +5,7 @@ import traceback
 from ..core.client import get_mem0_client
 from ..core.server import get_mcp_server
 
-def register_specialized_memory_types():
+def register_specialized_operations():
     """Register all specialized memory type operations with the MCP server."""
     mcp = get_mcp_server()
     if not mcp:
@@ -13,11 +13,9 @@ def register_specialized_memory_types():
         return False
         
     # Register all specialized memory type operations
-    register_short_term_memory(mcp)
     register_episodic_memory(mcp)
     register_semantic_memory(mcp)
     register_procedural_memory(mcp)
-    register_selective_memory(mcp)
     
     logging.info("Registered specialized memory type operations with MCP server")
     return True
