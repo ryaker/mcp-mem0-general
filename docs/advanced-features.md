@@ -34,7 +34,7 @@ categories = await mem0_get_categories()
 # Add a semantic memory with a custom category
 result = await mem0_add_semantic_memory(
     text="The project follows a microservices architecture with separate services for auth, content, and analytics.",
-    user_id="richard_yaker",
+    user_id="default_user",
     category="project_knowledge"
 )
 ```
@@ -56,7 +56,7 @@ Selective memory allows you to control what parts of a text are processed and st
 # Store only code blocks from technical documentation
 result = await mem0_add_memory_selective(
     text="# Setting Up the Project\n\nFollow these steps:\n\n```python\nimport os\nos.environ['DEBUG'] = 'True'\n```\n\nThis will enable debug mode.",
-    user_id="richard_yaker",
+    user_id="default_user",
     includes="```python.*?```",  # Only store Python code blocks
     metadata={"topic": "setup_instructions"}
 )
@@ -68,7 +68,7 @@ result = await mem0_add_memory_selective(
 # Store everything except personal information
 result = await mem0_add_memory_selective(
     text="My API key is ABC123XYZ. The application should be configured to use the production database.",
-    user_id="richard_yaker",
+    user_id="default_user",
     excludes="API key is .*?\\.",  # Exclude the API key
     metadata={"topic": "configuration"}
 )
@@ -80,7 +80,7 @@ result = await mem0_add_memory_selective(
 # Complex filtering example
 result = await mem0_add_memory_selective(
     text="User: John (john@example.com)\nPreferences: Dark mode, auto-save every 5 min\nSettings: API endpoint is https://api.example.com",
-    user_id="richard_yaker",
+    user_id="default_user",
     includes="Preferences:.*?\\n|Settings:.*?\\n",  # Only include preferences and settings
     excludes="john@example\\.com",  # Exclude email
     metadata={"topic": "user_configuration"}
@@ -138,7 +138,7 @@ The graph memory feature allows you to establish and explore relationships betwe
 # Enable graph processing when adding a memory
 result = await mem0_add_memory(
     text="React was created by Facebook and is maintained by Meta.",
-    user_id="richard_yaker",
+    user_id="default_user",
     enable_graph=True,
     metadata={"topic": "technology"}
 )
@@ -149,13 +149,13 @@ result = await mem0_add_memory(
 ```python
 # Query all relationships for an entity
 relations = await mem0_get_graph_relations(
-    user_id="richard_yaker",
+    user_id="default_user",
     entity="React"
 )
 
 # Query specific relationship types
 created_by_relations = await mem0_get_graph_relations(
-    user_id="richard_yaker",
+    user_id="default_user",
     entity="React",
     relation_type="created_by"
 )
@@ -197,7 +197,7 @@ The feedback mechanism allows you to provide feedback on memory quality, helping
 # Find a memory to provide feedback on
 search_result = await mem0_search_memory(
     query="project architecture",
-    user_id="richard_yaker"
+    user_id="default_user"
 )
 
 # Get the memory ID from the search results
@@ -257,7 +257,7 @@ Format code with language tags and indent properly.
 # 3. Add selective memory with graph processing
 await mem0_add_memory_selective(
     text="Our system uses a REST API at https://api.example.com/v2/. Authentication uses Bearer tokens. Example:\n```javascript\nfetch('https://api.example.com/v2/users', {\n  headers: { Authorization: 'Bearer TOKEN' }\n})```",
-    user_id="richard_yaker",
+    user_id="default_user",
     includes="(https://.*?/)|```javascript.*?```",
     enable_graph=True,
     metadata={"topic": "api_documentation"}

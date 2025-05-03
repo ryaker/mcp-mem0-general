@@ -48,7 +48,7 @@ Conversation memories track the content and context of ongoing dialogues.
 ```python
 mem0_add_short_term_memory(
     text="User mentioned they're planning a trip to Japan next spring.",
-    user_id="richard_yaker",
+    user_id="default_user",
     run_id="conversation_20230512",
     memory_type="conversation"
 )
@@ -62,7 +62,7 @@ Working memory holds information that is actively being processed or manipulated
 ```python
 mem0_add_short_term_memory(
     text="Working with the user to debug their React component.",
-    user_id="richard_yaker",
+    user_id="default_user",
     run_id="debugging_session_20230512",
     memory_type="working"
 )
@@ -76,7 +76,7 @@ Attention memory highlights particularly important information that needs to be 
 ```python
 mem0_add_short_term_memory(
     text="User needs to submit the application by 5pm today.",
-    user_id="richard_yaker",
+    user_id="default_user",
     run_id="application_session",
     memory_type="attention"
 )
@@ -92,7 +92,7 @@ Episodic memories record specific events, experiences, or occurrences with tempo
 ```python
 mem0_add_episodic_memory(
     text="I visited the Grand Canyon with my family.",
-    user_id="richard_yaker",
+    user_id="default_user",
     event_date="2023-07-15",
     metadata={"location": "Grand Canyon", "type": "vacation"}
 )
@@ -106,7 +106,7 @@ Semantic memories store factual knowledge, concepts, and information independent
 ```python
 mem0_add_semantic_memory(
     text="User prefers dark mode in all applications.",
-    user_id="richard_yaker",
+    user_id="default_user",
     category="preferences",
     metadata={"topic": "ui_preferences"}
 )
@@ -120,7 +120,7 @@ Procedural memories capture skills, processes, and how-to knowledge.
 ```python
 mem0_add_procedural_memory(
     text="To deploy the application: 1) Build the project, 2) Upload to the server, 3) Restart the service.",
-    user_id="richard_yaker",
+    user_id="default_user",
     skill_area="deployment",
     metadata={"application": "company_webapp"}
 )
@@ -134,7 +134,7 @@ In addition to these structured types, the system supports selective memory stor
 ```python
 mem0_add_memory_selective(
     text="My name is John Smith. I prefer dark mode and using vim keybindings in my IDE.",
-    user_id="richard_yaker",
+    user_id="default_user",
     excludes="My name is.*?\\.",  # Exclude personal identification
     metadata={"topic": "preferences"}
 )

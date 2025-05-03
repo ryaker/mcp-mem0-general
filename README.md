@@ -86,7 +86,7 @@ The server supports different memory types organized by duration and function:
 
 ## Usage
 
-All memories in the system use "richard_yaker" as the default user_id.
+All memories in the system use "default_user" as the default user_id.
 
 For detailed usage examples, see the [USAGE_GUIDE.md](USAGE_GUIDE.md).
 

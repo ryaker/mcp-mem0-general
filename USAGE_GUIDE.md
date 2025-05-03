@@ -4,7 +4,7 @@ This guide details the tools provided by the MCP Mem0 General Server and provide
 
 **Important:**
 
-*   Replace `"your_user_id"` in the examples with a unique identifier for yourself (e.g., `"richard_yaker"`). Consistency is key for Mem0 to associate memories correctly.
+*   Replace `"your_user_id"` in the examples with a unique identifier for yourself (e.g., `"default_user"`). Consistency is key for Mem0 to associate memories correctly.
 *   For features like Graph Memory, ensure your Mem0 plan supports it.
 *   Refer to the [Mem0 Documentation](https://docs.mem0.ai/) for more in-depth details on concepts like filters, metadata structure, etc.
 
@@ -32,37 +32,37 @@ Adds a new memory or updates existing memories based on the provided text and co
 *   **Simple Add:**
     ```
     Please remember that my favorite color is blue.
-    (Claude calls mem0_add_memory with text="My favorite color is blue", user_id="your_user_id")
+    (Claude calls mem0_add_memory with text="My favorite color is blue", user_id="default_user")
     ```
 
 *   **Add with Metadata:**
     ```
     Remember this project detail: The deadline for project 'Alpha' is next Friday. Associate this with category 'work' and priority 'high'.
-    (Claude calls mem0_add_memory with text="The deadline for project 'Alpha' is next Friday.", user_id="your_user_id", metadata={"category": "work", "priority": "high"})
+    (Claude calls mem0_add_memory with text="The deadline for project 'Alpha' is next Friday.", user_id="default_user", metadata={"category": "work", "priority": "high"})
     ```
 
 *   **Add with Graph Enabled:**
     ```
     Please remember this relationship using graph features: Alice reports to Bob.
-    (Claude calls mem0_add_memory with text="Alice reports to Bob.", user_id="your_user_id", enable_graph=True)
+    (Claude calls mem0_add_memory with text="Alice reports to Bob.", user_id="default_user", enable_graph=True)
     ```
 
 *   **Add with Timestamp:**
     ```
     Log this event as occurring on January 1st, 2024: We signed the contract.
-    (Claude calculates timestamp for Jan 1, 2024, e.g., 1704067200, then calls mem0_add_memory with text="We signed the contract.", user_id="your_user_id", timestamp=1704067200)
+    (Claude calculates timestamp for Jan 1, 2024, e.g., 1704067200, then calls mem0_add_memory with text="We signed the contract.", user_id="default_user", timestamp=1704067200)
     ```
 
 *   **Add with Expiration:**
     ```
     Remember that the promo code 'SAVE10' is valid until the end of this month. Set it to expire automatically.
-    (Claude calculates the expiration date string for end-of-month, e.g., "2025-05-31T23:59:59Z", then calls mem0_add_memory with text="Promo code 'SAVE10' is valid until end of month.", user_id="your_user_id", expiration_date="2025-05-31T23:59:59Z")
+    (Claude calculates the expiration date string for end-of-month, e.g., "2025-05-31T23:59:59Z", then calls mem0_add_memory with text="Promo code 'SAVE10' is valid until end of month.", user_id="default_user", expiration_date="2025-05-31T23:59:59Z")
     ```
 
 *   **Add with Selective Memory (Includes):**
     ```
     Store this conversation summary, but only focus on the parts mentioning 'budget' and 'timeline': [conversation text here...]
-    (Claude calls mem0_add_memory with text="[conversation text here...]", user_id="your_user_id", includes="budget,timeline")
+    (Claude calls mem0_add_memory with text="[conversation text here...]", user_id="default_user", includes="budget,timeline")
     ```
 
 ### 2. `mem0_search_memory`
@@ -84,26 +84,26 @@ Searches for memories relevant to a query, optionally applying filters and graph
 *   **Simple Search:**
     ```
     What do you remember about my favorite color?
-    (Claude calls mem0_search_memory with query="my favorite color", user_id="your_user_id")
+    (Claude calls mem0_search_memory with query="my favorite color", user_id="default_user")
     ```
 
 *   **Search with Graph:**
     ```
     Tell me about the relationships you know regarding Alice (use graph search).
-    (Claude calls mem0_search_memory with query="relationships regarding Alice", user_id="your_user_id", enable_graph=True)
+    (Claude calls mem0_search_memory with query="relationships regarding Alice", user_id="default_user", enable_graph=True)
     ```
 
 *   **Search with Filters (Metadata):**
     ```
     Find memories related to 'project deadlines' in the 'work' category.
-    (Claude constructs filter JSON string: '{"metadata": {"category": "work"}}' then calls mem0_search_memory with query="project deadlines", user_id="your_user_id", filters='{"metadata": {"category": "work"}}')
+    (Claude constructs filter JSON string: '{"metadata": {"category": "work"}}' then calls mem0_search_memory with query="project deadlines", user_id="default_user", filters='{"metadata": {"category": "work"}}')
     ```
     *Note: Claude needs to correctly format the dictionary into a JSON string for the `filters` parameter.* 
 
 *   **Search with Threshold:**
     ```
     Search for memories about 'vacation plans', but only show highly relevant results.
-    (Claude calls mem0_search_memory with query="vacation plans", user_id="your_user_id", threshold=0.8)
+    (Claude calls mem0_search_memory with query="vacation plans", user_id="default_user", threshold=0.8)
     ```
 
 ### 3. `mem0_get_all_memories`
@@ -125,19 +125,19 @@ Retrieves all memories, optionally filtered by ID and paginated.
 *   **Get All for User:**
     ```
     List all memories you have stored for me.
-    (Claude calls mem0_get_all_memories with user_id="your_user_id")
+    (Claude calls mem0_get_all_memories with user_id="default_user")
     ```
 
 *   **Get All with Pagination:**
     ```
     Show me the first 10 memories you have for me.
-    (Claude calls mem0_get_all_memories with user_id="your_user_id", page=1, page_size=10)
+    (Claude calls mem0_get_all_memories with user_id="default_user", page=1, page_size=10)
     ```
 
 *   **Get All for Session:**
     ```
     List the memories created during this specific session run.
-    (Claude needs the current run_id, e.g., "run123", then calls mem0_get_all_memories with user_id="your_user_id", run_id="run123")
+    (Claude needs the current run_id, e.g., "run123", then calls mem0_get_all_memories with user_id="default_user", run_id="run123")
     ```
 
 ### 4. `mem0_get_memory_by_id`
@@ -208,11 +208,11 @@ Counts the number of memories, optionally applying filters.
 *   **Count All for User:**
     ```
     How many memories do you have stored for me in total?
-    (Claude calls mem0_count_memories with user_id="your_user_id")
+    (Claude calls mem0_count_memories with user_id="default_user")
     ```
 
 *   **Count with Filters:**
     ```
     Count how many memories I have in the 'work' category.
-    (Claude calls mem0_count_memories with user_id="your_user_id", filters={"metadata": {"category": "work"}})
+    (Claude calls mem0_count_memories with user_id="default_user", filters={"metadata": {"category": "work"}})
     ``` 
