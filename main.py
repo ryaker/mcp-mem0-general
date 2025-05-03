@@ -613,6 +613,334 @@ def setup_server():
             logging.error(traceback.format_exc())
             return {"status": "error", "message": str(e)}
 
+    @mcp.tool()
+    async def mem0_update_categories(
+        custom_categories: list,
+        explanation: str = "",
+    ) -> dict:
+        """
+        Update the project's custom memory categories.
+        
+        Provide a list of custom categories as dictionaries with category name as key and description as value.
+        These categories will be used instead of the default ones (personal_details, family, etc.).
+        
+        Example:
+        [
+            {"coding_patterns": "Programming style preferences and development habits"},
+            {"app_settings": "User interface preferences and configuration choices"},
+            {"learning_goals": "Educational objectives and skill development targets"}
+        ]
+        
+        Optionally provide an explanation to document the reason for these categories.
+        """
+        logging.info(f"Updating custom categories: {custom_categories}")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            response = await mem0_instance.update_project(custom_categories=custom_categories)
+            logging.info(f"Updated custom categories: {response}")
+            return {
+                "status": "success", 
+                "details": response,
+                "explanation": explanation if explanation else "Custom categories updated successfully"
+            }
+        except Exception as e:
+            logging.error(f"Error updating custom categories: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    @mcp.tool()
+    async def mem0_get_categories(
+    ) -> dict:
+        """
+        Get the current custom categories for the project.
+        
+        Returns the list of custom categories if defined, or indicates that default categories 
+        are being used (personal_details, family, professional_details, sports, travel, etc.)
+        """
+        logging.info("Getting current custom categories")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            response = await mem0_instance.get_project(fields=["custom_categories"])
+            logging.info(f"Retrieved custom categories: {response}")
+            
+            if response.get("custom_categories"):
+                return {
+                    "status": "success", 
+                    "custom_categories": response.get("custom_categories"),
+                    "using_default": False
+                }
+            else:
+                return {
+                    "status": "success", 
+                    "custom_categories": None,
+                    "using_default": True,
+                    "default_categories": [
+                        "personal_details", "family", "professional_details", 
+                        "sports", "travel", "food", "music", "health", 
+                        "technology", "hobbies", "fashion", "entertainment", 
+                        "milestones", "user_preferences", "misc"
+                    ]
+                }
+        except Exception as e:
+            logging.error(f"Error getting custom categories: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    @mcp.tool()
+    async def mem0_set_instructions(
+        instructions: str,
+        explanation: str = "",
+    ) -> dict:
+        """
+        Set custom instructions for memory extraction.
+        
+        These instructions guide how information is extracted and stored from conversations.
+        They act as project-level guidelines for memory processing.
+        
+        Example:
+        "Extract only technical information about coding preferences. 
+         Ignore personal details and focus on tools, languages and frameworks.
+         Always capture specific version numbers and library preferences."
+         
+        Optionally provide an explanation to document the purpose of these instructions.
+        """
+        logging.info(f"Setting custom instructions: {instructions[:100]}...")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            response = await mem0_instance.update_project(custom_instructions=instructions)
+            logging.info(f"Set custom instructions: {response}")
+            return {
+                "status": "success", 
+                "details": response,
+                "explanation": explanation if explanation else "Custom instructions set successfully"
+            }
+        except Exception as e:
+            logging.error(f"Error setting custom instructions: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    @mcp.tool()
+    async def mem0_get_instructions(
+    ) -> dict:
+        """
+        Get the current custom instructions for the project.
+        
+        Returns the custom instructions if defined, or indicates that no custom
+        instructions are being used.
+        """
+        logging.info("Getting current custom instructions")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            response = await mem0_instance.get_project(fields=["custom_instructions"])
+            logging.info(f"Retrieved custom instructions: {response}")
+            
+            return {
+                "status": "success", 
+                "custom_instructions": response.get("custom_instructions"),
+                "has_custom_instructions": bool(response.get("custom_instructions"))
+            }
+        except Exception as e:
+            logging.error(f"Error getting custom instructions: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    @mcp.tool()
+    async def mem0_get_graph_relations(
+        user_id: str,
+        entity: str,
+        relation_type: str = "",
+    ) -> dict:
+        """
+        Get graph relationships for a specific entity.
+        Requires graph features to be enabled.
+        
+        Parameters:
+        - user_id: User ID to query relationships for
+        - entity: The entity to find relationships for (e.g., "Python", "Machine Learning")
+        - relation_type: Optional filter for specific relation types
+        
+        Returns graph relationships connected to the entity, such as:
+        - "Python" -> "is used for" -> "Web Development"
+        - "Python" -> "has library" -> "TensorFlow"
+        """
+        logging.info(f"Getting graph relations for entity: {entity}, user: {user_id}")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            # Implementation depends on Mem0's graph API, this is a provisional approach
+            search_args = {
+                "user_id": user_id,
+                "enable_graph": True,
+                "output_format": "v1.1",
+                "filters": {"entity": entity}
+            }
+            
+            if relation_type:
+                search_args["filters"]["relation_type"] = relation_type
+            
+            # Use search with entity as query and graph enabled
+            response = await mem0_instance.search(
+                entity, 
+                **search_args
+            )
+            
+            logging.info(f"Retrieved graph relations: {response}")
+            return {
+                "status": "success", 
+                "entity": entity,
+                "relations": response
+            }
+        except Exception as e:
+            logging.error(f"Error getting graph relations: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    @mcp.tool()
+    async def mem0_send_feedback(
+        memory_id: str,
+        feedback_type: str,
+        comments: str = "",
+    ) -> dict:
+        """
+        Provide feedback on a memory to improve future retrieval quality.
+        
+        Parameters:
+        - memory_id: ID of the memory to provide feedback on
+        - feedback_type: Type of feedback (choose one):
+          * "relevant" - The memory was relevant to the query
+          * "not_relevant" - The memory wasn't relevant to the query
+          * "accurate" - The memory contained accurate information
+          * "inaccurate" - The memory contained inaccurate information
+        - comments: Optional additional feedback comments
+        
+        This feedback helps the system improve memory quality and retrieval accuracy over time.
+        """
+        valid_feedback_types = ["relevant", "not_relevant", "accurate", "inaccurate"]
+        
+        if feedback_type not in valid_feedback_types:
+            return {
+                "status": "error", 
+                "message": f"Invalid feedback type. Must be one of: {', '.join(valid_feedback_types)}"
+            }
+        
+        logging.info(f"Sending feedback for memory: {memory_id}, type: {feedback_type}")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            # Implementation based on Mem0's feedback API
+            response = await mem0_instance.feedback(
+                memory_id=memory_id,
+                feedback_type=feedback_type,
+                comments=comments
+            )
+            
+            logging.info(f"Sent feedback successfully: {response}")
+            return {
+                "status": "success", 
+                "details": response
+            }
+        except Exception as e:
+            logging.error(f"Error sending feedback: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    # Enhance the existing mem0_add_memory function with more documentation on includes/excludes
+    @mcp.tool()
+    async def mem0_add_memory_selective(
+        text: str,
+        user_id: str,
+        includes: str = "",
+        excludes: str = "",
+        metadata: dict = {},
+        run_id: str = "",
+        enable_graph: bool = False,
+    ) -> dict:
+        """
+        Adds a memory to Mem0 with selective memory controls.
+        
+        Parameters:
+        - text: The content to store as a memory
+        - user_id: User ID to associate the memory with
+        - includes: Specific types of information to include (e.g., "only work-related information")
+          Use this to focus memory on specific topics or information types
+        - excludes: Types of information to exclude (e.g., "ignore personal details")
+          Use this to prevent storing sensitive or irrelevant information
+        - metadata: Additional structured data about this memory
+        - run_id: Optional session identifier for conversation context
+        - enable_graph: Enable knowledge graph processing
+        
+        Examples:
+        - includes="only remember hobby-related information"
+        - excludes="ignore addresses and phone numbers"
+        
+        This provides more control over what information gets stored in memory.
+        """
+        logging.info(f"Adding selective memory: user={user_id}, run={run_id}, includes='{includes}', excludes='{excludes}', text='{text[:50]}...'")
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            add_args = {"user_id": user_id, "version": "v2"}
+            
+            # Add metadata if provided
+            if metadata and isinstance(metadata, dict):
+                add_args["metadata"] = metadata
+                logging.info(f"Using provided metadata: {metadata}")
+            
+            # Add selective memory parameters
+            if includes:
+                add_args["includes"] = includes
+                logging.info(f"Using includes filter: '{includes}'")
+            
+            if excludes:
+                add_args["excludes"] = excludes
+                logging.info(f"Using excludes filter: '{excludes}'")
+            
+            # Add run_id if provided
+            if run_id:
+                add_args["run_id"] = run_id
+                logging.info(f"Using run_id: {run_id}")
+            
+            # Add graph processing if enabled
+            if enable_graph:
+                add_args["enable_graph"] = True
+                add_args["output_format"] = "v1.1"
+                logging.info(f"Enabling graph processing")
+            
+            message_list = [{"role": "user", "content": text}]
+            response = await mem0_instance.add(message_list, **add_args)
+            
+            logging.info(f"Mem0 add selective memory response: {response}")
+            return {"status": "success", "details": response}
+        except Exception as e:
+            logging.error(f"Error adding selective memory: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
     return True # Indicate setup success
 
 def start_server():

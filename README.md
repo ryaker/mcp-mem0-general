@@ -1,157 +1,136 @@
-# MCP-Mem0-Server
+# Mem0 MCP Server 🧠
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+An implementation of the [Model Context Protocol](https://github.com/anthropics/model-context-protocol) for [Mem0.ai](https://mem0.ai) persistent memory.
 
-A Model Context Protocol (MCP) server that provides persistent memory for Large Language Models using Mem0.ai. This server enables LLMs like Claude to maintain persistent memory across conversations.
+## Overview
+
+This MCP server provides a bridge between AI assistants (Claude, ChatGPT, etc.) and Mem0.ai's persistent memory system. It allows AI assistants to:
+
+1. Store important information persistently across sessions
+2. Retrieve relevant memories based on context
+3. Build a knowledge graph of connected information
+4. Organize memories into cognitive-inspired structures
 
 ## Features
 
-- **Persistent Memory Storage**: Store and retrieve memories across LLM conversations
-- **Semantic Search**: Find relevant memories using natural language queries
-- **Memory Management**: Add, retrieve, update, and delete memories
-- **Optional Knowledge Graph Support**: Enable graph-based memory relationships with Neo4j integration
-- **Structured Memory Types**: Support for different memory types (short-term, episodic, semantic, procedural)
-- **Simple Integration**: Works with any MCP-compatible client like Claude Desktop
-
-## Prerequisites
-
-- Python 3.10 or higher
-- Mem0.ai API key ([sign up here](https://mem0.ai))
-- (Optional) Neo4j instance for graph features
+- **Basic Memory Operations**: Add, search, retrieve, update, and delete memories
+- **Specialized Memory Types**:
+  - Short-term (conversation, working, attention context)
+  - Long-term (episodic, semantic, procedural)
+- **Advanced Features**:
+  - Custom memory categories
+  - Selective memory with includes/excludes controls
+  - Custom memory processing instructions
+  - Knowledge graph relationship retrieval
+  - Memory quality feedback mechanism
 
 ## Installation
 
-### Using a Virtual Environment (Recommended)
+### Prerequisites
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/mcp-mem0-server.git
-cd mcp-mem0-server
+- Python 3.9+
+- Mem0.ai API key
+- [Optional] Neo4j database for graph capabilities
 
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+### Setup
 
-# Install the package
-pip install .  # For basic functionality
-# OR
-pip install .[neo4j]  # If you want to use graph features
-```
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/yourusername/mcp-mem0-general.git
+   cd mcp-mem0-general
+   ```
 
-### Global Installation (Not Recommended)
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-While global installation is possible, we've encountered dependency conflicts when installing globally alongside other packages. If you must install globally, consider using an isolated environment manager.
+3. Create a configuration file:
+   ```bash
+   cp mcp-config.sample.json mcp-config.json
+   ```
 
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```
-MEM0_API_KEY=your_mem0_api_key_here
-```
-
-For graph features (optional):
-
-```
-MEM0_GRAPH_DB_URI=bolt://localhost:7687
-MEM0_GRAPH_DB_USER=neo4j
-MEM0_GRAPH_DB_PASSWORD=your_password
-```
-
-### `.env.example` File
-
-A `.env.example` file is included in the repository. Copy it to create your own `.env` file:
-
-```bash
-cp .env.example .env
-# Then edit .env with your actual values
-```
+4. Add your Mem0.ai API key to the configuration file or set it as an environment variable:
+   ```bash
+   export MEM0_API_KEY="your-mem0-api-key"
+   ```
 
 ## Usage
 
-### Running the Server
-
-Once installed, you can run the server using the provided script:
+### Starting the Server
 
 ```bash
-mcp-mem0-server
+python main.py
 ```
 
-The server will start and listen for MCP protocol requests.
+This will start the MCP server on http://localhost:8000 by default.
 
-### Client Configuration
+### Connecting to the Server
 
-Here's an example configuration for Claude Desktop:
-
-```json
-{
-  "name": "Memory",
-  "description": "Persistent memory with Mem0",
-  "command": "/absolute/path/to/mcp-mem0-server",
-  "env": {
-    "MEM0_API_KEY": "your_mem0_api_key_here"
-  }
-}
+In a Claude, ChatGPT, or other MCP-compatible client, add the server URL:
+```
+http://localhost:8000
 ```
 
-> **Note**: Some clients like Claude Desktop may require the absolute path to the executable. You can find this by running `which mcp-mem0-server` in your terminal.
+The server provides the following tools that will be available to the AI:
 
-### Available Tools
+```
+mem0_add_memory
+mem0_search_memory
+mem0_get_all_memories
+mem0_get_memory_by_id
+mem0_delete_memory
+mem0_update_memory
+...and many more
+```
 
-The server provides these MCP tools:
+See the [documentation](./docs/README.md) for details on all available tools.
 
-#### Basic Memory Operations
-- `mem0_add_memory`: Add a new memory (generic)
-- `mem0_search_memory`: Find memories based on a query
-- `mem0_get_all_memories`: Retrieve all stored memories
-- `mem0_get_memory_by_id`: Get a specific memory by ID
-- `mem0_delete_memory`: Remove a memory
-- `mem0_update_memory`: Modify an existing memory
+## Documentation
 
-#### Specialized Memory Types
-- `mem0_add_short_term_memory`: Add session-specific memory (conversation, working, attention context)
-- `mem0_add_episodic_memory`: Add memory of specific events and experiences
-- `mem0_add_semantic_memory`: Add memory of facts and preferences
-- `mem0_add_procedural_memory`: Add memory of skills and habits
+Comprehensive documentation is available in the [docs directory](./docs/):
 
-The specialized memory tools provide structured metadata that makes it easier to organize and retrieve memories by type.
+- [Getting Started Guide](./docs/getting-started.md)
+- [Complete API Reference](./docs/api-reference.md) 
+- [Memory Types Guide](./docs/memory-types.md)
+- [Advanced Features](./docs/advanced-features.md)
+- [Tutorial Collection](./docs/tutorials/)
 
-## Troubleshooting
+### Loading Documentation into Memory
 
-### Common Issues
+For a better experience, you can load the documentation directly into your Mem0 instance:
 
-#### "No module named 'fastmcp'"
-- Ensure you're using the correct Python environment where the package is installed
-- Try running with the full path to the executable
+```bash
+python scripts/load_docs.py
+```
 
-#### TypeError with load_dotenv()
-- Make sure you have the latest version installed
-- Reinstall the package if needed
+Once loaded, you can simply ask the AI assistant to:
 
-#### Command not found
-- Check if the script is in your PATH
-- Use the absolute path to the script in your client configuration
+```
+Retrieve memory ID 76100ac4-896e-488b-90ad-036c0dfaaa80 using mem0_get_memory_by_id. 
+Display only the content of the memory found, then wait for further instructions.
+```
 
-#### API Key Issues
-- Verify your API key is correctly set in the .env file or directly in the client configuration
-- Ensure the API key is valid and has the necessary permissions
+This will load the complete Mem0 usage guide directly in your chat. You can also search for specific tutorials.
 
-### Logging
+## Advanced Configuration
 
-Logs are saved to `~/.mcp_mem0_server.log` and stderr. Check these logs for debugging information.
+See [Configuration Guide](./docs/configuration.md) for details on:
+- Custom memory categories
+- Memory extraction instructions
+- Graph database integration
+- Security settings
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [Mem0.ai](https://mem0.ai) for their excellent memory API
+- [FastMCP](https://github.com/anthropics/fastMCP) for the MCP server implementation
+- All contributors to this project 
