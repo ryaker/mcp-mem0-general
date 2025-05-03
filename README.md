@@ -10,6 +10,7 @@ A Model Context Protocol (MCP) server that provides persistent memory for Large 
 - **Semantic Search**: Find relevant memories using natural language queries
 - **Memory Management**: Add, retrieve, update, and delete memories
 - **Optional Knowledge Graph Support**: Enable graph-based memory relationships with Neo4j integration
+- **Structured Memory Types**: Support for different memory types (short-term, episodic, semantic, procedural)
 - **Simple Integration**: Works with any MCP-compatible client like Claude Desktop
 
 ## Prerequisites
@@ -101,12 +102,21 @@ Here's an example configuration for Claude Desktop:
 
 The server provides these MCP tools:
 
-- `mem0_add_memory`: Add a new memory
+#### Basic Memory Operations
+- `mem0_add_memory`: Add a new memory (generic)
 - `mem0_search_memory`: Find memories based on a query
 - `mem0_get_all_memories`: Retrieve all stored memories
 - `mem0_get_memory_by_id`: Get a specific memory by ID
 - `mem0_delete_memory`: Remove a memory
 - `mem0_update_memory`: Modify an existing memory
+
+#### Specialized Memory Types
+- `mem0_add_short_term_memory`: Add session-specific memory (conversation, working, attention context)
+- `mem0_add_episodic_memory`: Add memory of specific events and experiences
+- `mem0_add_semantic_memory`: Add memory of facts and preferences
+- `mem0_add_procedural_memory`: Add memory of skills and habits
+
+The specialized memory tools provide structured metadata that makes it easier to organize and retrieve memories by type.
 
 ## Troubleshooting
 

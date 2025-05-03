@@ -171,15 +171,22 @@ def setup_server():
         filters: str = "",  # Required with default (JSON string)
         threshold: float = 0.0,  # Required with default
         enable_graph: bool = False,
+        memory_duration: str = "",  # New parameter for filtering by duration type
+        memory_type: str = "",  # New parameter for filtering by memory type
     ) -> dict:
         """Searches memories in Mem0. Requires user_id and query.
         Parameters like agent_id, run_id, filters, threshold have defaults if not provided.
+        
+        For advanced filtering:
+        - memory_duration: Filter by "short_term" or "long_term"
+        - memory_type: Filter by "conversation", "working", "attention", "episodic", "semantic", or "procedural"
+        
         Filters is a JSON string representing a dictionary (default "" ignored).
         Threshold is a float for minimum similarity score (default 0.0 ignored).
         Optional: Set enable_graph=True to use graph retrieval.
         Example Filters: '{\\"categories\\": [\\"work\\"], \\"metadata\\": {\\"project\\": \\"xyz\\"}}'"""
         
-        logging.info(f"Search request: user={user_id}, agent={agent_id}, run={run_id}, filters={filters}, threshold={threshold}, enable_graph={enable_graph}, query='{query[:50]}...'")
+        logging.info(f"Search request: user={user_id}, agent={agent_id}, run={run_id}, filters={filters}, memory_duration={memory_duration}, memory_type={memory_type}, threshold={threshold}, enable_graph={enable_graph}, query='{query[:50]}...'")
         
         if not mem0_instance:
             logging.error("Mem0 instance not initialized.")
@@ -187,26 +194,34 @@ def setup_server():
 
         try:
             search_args = {"user_id": user_id}
-            filter_dict = None
+            filter_dict = {}
             
             # Parse filters if provided and not the default empty string
             if filters:
                 try:
-                    filter_dict = json.loads(filters)
-                    if isinstance(filter_dict, dict):
-                        search_args["filters"] = filter_dict
-                        logging.info(f"Applying parsed filters: {filter_dict}")
+                    parsed_filters = json.loads(filters)
+                    if isinstance(parsed_filters, dict):
+                        filter_dict.update(parsed_filters)
+                        logging.info(f"Applied parsed filters: {parsed_filters}")
                     else:
-                        logging.warning(f"Parsed filters is not a dictionary (type: {type(filter_dict)}), discarding filters: {filters}")
-                        filter_dict = None # Discard if not dict
+                        logging.warning(f"Parsed filters is not a dictionary (type: {type(parsed_filters)}), discarding filters: {filters}")
                 except json.JSONDecodeError as json_err:
                     logging.error(f"Failed to parse filters JSON string: {filters}. Error: {json_err}")
-                    # Optionally return an error or proceed without filters
-                    # return {"status": "error", "message": f"Invalid filters format: {json_err}"}
-                    logging.warning("Proceeding without filters due to parsing error.")
-                    filter_dict = None
-            else:
-                 logging.info("No filters provided or filters is empty, skipping.")
+                    logging.warning("Proceeding without parsed filters due to parsing error.")
+            
+            # Add memory type filters if provided
+            if memory_duration:
+                filter_dict["metadata.memory_duration"] = memory_duration
+                logging.info(f"Adding memory_duration filter: {memory_duration}")
+                
+            if memory_type:
+                filter_dict["metadata.memory_type"] = memory_type
+                logging.info(f"Adding memory_type filter: {memory_type}")
+            
+            # Only add filters to search args if we have any
+            if filter_dict:
+                search_args["filters"] = filter_dict
+                logging.info(f"Final combined filters: {filter_dict}")
 
             # --- Apply workaround for other originally optional parameters ---
             if agent_id: # Check if not default ""
@@ -363,6 +378,238 @@ def setup_server():
             return {"status": "success", "details": response}
         except Exception as e:
             logging.error(f"Error updating memory: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    # New specialized memory tools
+    @mcp.tool()
+    async def mem0_add_short_term_memory(
+        text: str,
+        user_id: str,
+        run_id: str,
+        memory_type: str = "conversation",
+        metadata: dict = {},
+        enable_graph: bool = False,
+    ) -> dict:
+        """
+        Adds short-term memory for real-time context during a session.
+        Requires user_id and run_id to create session-specific memory.
+        
+        memory_type options:
+        - "conversation": Recent messages and their order
+        - "working": Temporary variables and state
+        - "attention": Current focus of the conversation
+        """
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            # Prepare metadata with memory structure information
+            combined_metadata = {
+                "memory_duration": "short_term",
+                "memory_type": memory_type
+            }
+            
+            # Merge with any user-provided metadata
+            if metadata:
+                combined_metadata.update(metadata)
+                
+            logging.info(f"Adding short-term memory: type={memory_type}, user={user_id}, run={run_id}")
+            
+            add_args = {
+                "user_id": user_id,
+                "run_id": run_id,
+                "metadata": combined_metadata,
+                "version": "v2"
+            }
+            
+            if enable_graph:
+                add_args["enable_graph"] = True
+                add_args["output_format"] = "v1.1"
+                
+            message_list = [{"role": "user", "content": text}]
+            response = await mem0_instance.add(message_list, **add_args)
+            
+            logging.info(f"Mem0 add short-term memory response: {response}")
+            return {"status": "success", "details": response}
+        except Exception as e:
+            logging.error(f"Error adding short-term memory: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+    
+    @mcp.tool()
+    async def mem0_add_episodic_memory(
+        text: str,
+        user_id: str,
+        event_date: str = "",
+        metadata: dict = {},
+        enable_graph: bool = False,
+    ) -> dict:
+        """
+        Adds episodic memory - remembers specific events and experiences.
+        Requires user_id to create persistent memory.
+        
+        Optionally provide:
+        - event_date: When this event occurred (e.g., "2023-05-15")
+        - metadata: Additional structured data about this memory
+        - enable_graph: Enable knowledge graph processing
+        """
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            # Prepare metadata with memory structure information
+            combined_metadata = {
+                "memory_duration": "long_term",
+                "memory_type": "episodic"
+            }
+            
+            # Add event date if provided
+            if event_date:
+                combined_metadata["event_date"] = event_date
+                
+            # Merge with any user-provided metadata
+            if metadata:
+                combined_metadata.update(metadata)
+                
+            logging.info(f"Adding episodic memory for user={user_id}")
+            
+            add_args = {
+                "user_id": user_id,
+                "metadata": combined_metadata,
+                "version": "v2"
+            }
+            
+            if enable_graph:
+                add_args["enable_graph"] = True
+                add_args["output_format"] = "v1.1"
+                
+            message_list = [{"role": "user", "content": text}]
+            response = await mem0_instance.add(message_list, **add_args)
+            
+            logging.info(f"Mem0 add episodic memory response: {response}")
+            return {"status": "success", "details": response}
+        except Exception as e:
+            logging.error(f"Error adding episodic memory: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+    
+    @mcp.tool()
+    async def mem0_add_semantic_memory(
+        text: str,
+        user_id: str,
+        category: str = "",
+        metadata: dict = {},
+        enable_graph: bool = True,
+    ) -> dict:
+        """
+        Adds semantic memory - stores facts and preferences.
+        Requires user_id to create persistent memory.
+        
+        Optionally provide:
+        - category: Type of fact (e.g., "preference", "personal_info", "knowledge")
+        - metadata: Additional structured data about this memory
+        - enable_graph: Enable knowledge graph processing (default: True for semantic memories)
+        """
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            # Prepare metadata with memory structure information
+            combined_metadata = {
+                "memory_duration": "long_term",
+                "memory_type": "semantic"
+            }
+            
+            # Add category if provided
+            if category:
+                combined_metadata["category"] = category
+                
+            # Merge with any user-provided metadata
+            if metadata:
+                combined_metadata.update(metadata)
+                
+            logging.info(f"Adding semantic memory for user={user_id}, category={category}")
+            
+            add_args = {
+                "user_id": user_id,
+                "metadata": combined_metadata,
+                "version": "v2"
+            }
+            
+            # Default to enable_graph=True for semantic memories unless explicitly disabled
+            if enable_graph:
+                add_args["enable_graph"] = True
+                add_args["output_format"] = "v1.1"
+                
+            message_list = [{"role": "user", "content": text}]
+            response = await mem0_instance.add(message_list, **add_args)
+            
+            logging.info(f"Mem0 add semantic memory response: {response}")
+            return {"status": "success", "details": response}
+        except Exception as e:
+            logging.error(f"Error adding semantic memory: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+    
+    @mcp.tool()
+    async def mem0_add_procedural_memory(
+        text: str,
+        user_id: str,
+        skill_area: str = "",
+        metadata: dict = {},
+        enable_graph: bool = False,
+    ) -> dict:
+        """
+        Adds procedural memory - records skills and habits.
+        Requires user_id to create persistent memory.
+        
+        Optionally provide:
+        - skill_area: Area of skill/habit (e.g., "coding", "communication", "workflow")
+        - metadata: Additional structured data about this memory
+        - enable_graph: Enable knowledge graph processing
+        """
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            # Prepare metadata with memory structure information
+            combined_metadata = {
+                "memory_duration": "long_term",
+                "memory_type": "procedural"
+            }
+            
+            # Add skill area if provided
+            if skill_area:
+                combined_metadata["skill_area"] = skill_area
+                
+            # Merge with any user-provided metadata
+            if metadata:
+                combined_metadata.update(metadata)
+                
+            logging.info(f"Adding procedural memory for user={user_id}, skill_area={skill_area}")
+            
+            add_args = {
+                "user_id": user_id,
+                "metadata": combined_metadata,
+                "version": "v2"
+            }
+            
+            if enable_graph:
+                add_args["enable_graph"] = True
+                add_args["output_format"] = "v1.1"
+                
+            message_list = [{"role": "user", "content": text}]
+            response = await mem0_instance.add(message_list, **add_args)
+            
+            logging.info(f"Mem0 add procedural memory response: {response}")
+            return {"status": "success", "details": response}
+        except Exception as e:
+            logging.error(f"Error adding procedural memory: {e}")
             logging.error(traceback.format_exc())
             return {"status": "error", "message": str(e)}
 
