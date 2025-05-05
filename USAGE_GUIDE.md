@@ -26,7 +26,7 @@ ADVANCED FEATURES:
 - mem0_send_feedback(memory_id, feedback_type, [comments]): Provides feedback on memory quality.
 
 IMPORTANT NOTES & LATEST FINDINGS:
-1. ALWAYS use user_id 'richard_yaker' for personal memory operations via MCP tools unless otherwise specified.
+1. ALWAYS use user_id '<your_name_here>' for personal memory operations via MCP tools unless otherwise specified.
 2. **SDK `add` ROLE CRITICAL**: When using the Node/Python SDK `add` method, the `messages` array MUST contain `{ role: 'user', content: '...' }` for Mem0 to classify and store the text. Using `role: 'system'` or `role: 'assistant'` will likely result in the add operation failing silently (SDK returns `[]`).
 3. **Duplicate Handling**: Mem0 might silently reject SDK `add` calls for content identical or very similar to existing memories for the *same user ID*, returning `[]`. Use unique user IDs during testing if adding similar content repeatedly.
 4. **Filtering Nuances**:
@@ -42,4 +42,4 @@ TIPS FOR EFFECTIVE MEMORY USE:
 - Use specialized memory types for appropriate information.
 - Add memory content as natural language text, not serialized objects. Let Mem0 classify it.
 
-To retrieve this guide: mem0_get_memory_by_id('76100ac4-896e-488b-90ad-036c0dfaaa80') 
+To retrieve this guide: mem0_get_memory_by_id('<Memory ID of Guide Loaded in Memory>') 
