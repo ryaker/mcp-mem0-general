@@ -7,7 +7,7 @@ import traceback
 import typing # Add typing import
 from pathlib import Path # For home directory
 from dotenv import load_dotenv
-from fastmcp import FastMCP
+from modelcontextprotocol import FastMCP
 # Use AsyncMemoryClient
 from mem0 import AsyncMemoryClient 
 # Removed MemoryClient and certifi imports
