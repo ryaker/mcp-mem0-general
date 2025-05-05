@@ -72,6 +72,40 @@ You might see a warning like `warning: The package mem0ai==0.1.96 does not have 
 *   **If using the managed Mem0.ai platform:** This warning can be safely ignored. The necessary graph processing happens server-side on the Mem0 platform.
 *   **If self-hosting Mem0 with Neo4j:** This warning indicates that the specific `mem0ai` version didn't automatically install Neo4j-related Python libraries (`langchain-neo4j`, `neo4j`). You would need to ensure these are installed manually in your self-hosted environment if using graph features.
 
+## Loading the Usage Guide into Memory (Recommended)
+
+To make it easy for your AI assistant to reference the server's capabilities, you can load the `USAGE_GUIDE.md` content into Mem0. Follow these steps:
+
+**Prerequisite:** Ensure the Mem0 MCP server is running and configured correctly in your AI assistant (Claude/Cursor) as described in the "Getting Started" section above.
+
+1.  **Copy the Guide Content:** Open the [USAGE_GUIDE.md](USAGE_GUIDE.md) file. Select and copy its *entire* text content.
+
+2.  **Ask Assistant to Add Memory:** Go to your AI assistant (Claude/Cursor) and use a prompt similar to this, pasting the guide content you copied where indicated. Make sure to use your consistent `user_id` (e.g., "default_user").
+
+    ```
+Please remember the following usage guide for the Mem0 MCP server. Use user_id "default_user" and add metadata `{"title": "Mem0 MCP Usage Guide", "source": "README Instruction"}`:
+
+[--- PASTE THE ENTIRE USAGE_GUIDE.md CONTENT HERE ---]
+```
+
+    The assistant should call the `mem0_add_memory` tool.
+
+3.  **Find the Memory ID:** Once the assistant confirms the memory is added, ask it to find the specific ID for that memory:
+
+    ```
+Please search my memories for user_id "default_user" using the query "Mem0 MCP Usage Guide" and tell me the exact memory ID of that guide memory you just added.
+```
+
+    The assistant should use the `mem0_search_memory` tool and provide you with an ID string (e.g., `76100ac4-896e-488b-90ad-036c0dfaaa80`). **Note down this ID!**
+
+4.  **Retrieve the Guide Later:** Now that you have the ID, you can quickly ask your assistant to recall the full guide anytime:
+
+    ```
+Retrieve memory ID *your-guide-id-here* using mem0_get_memory_by_id.
+```
+
+    (Replace *`your-guide-id-here`* with the actual ID you noted down in step 3).
+
 ## Memory Types
 
 The server supports different memory types organized by duration and function:
