@@ -10,7 +10,7 @@ authors = [
     {name = "Your Name", email = "your@email.com"}, # TODO: Update author info
 ]
 dependencies = [
-    "modelcontextprotocol>=0.1.0",
+    "mcp>=0.1.0",
     "python-dotenv>=1.0.0",
     "fastapi>=0.100.0", # Added explicitly, though MCP SDK might pull it in
     "uvicorn[standard]>=0.20.0", # Added for running the server
