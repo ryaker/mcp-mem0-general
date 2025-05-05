@@ -15,52 +15,62 @@ This server provides MCP-compatible tools that let any compatible AI assistant a
 
 ## Project Structure
 
-The project has been refactored from a monolithic design to a modular structure:
+The project code is located within the `src/mcp_mem0_general/` directory.
 
+## Getting Started (No Installation Needed!)
+
+This server can be run directly from GitHub using `uvx` without needing to clone the repository or install it locally.
+
+### Running the Server
+
+Ensure you have `uv` installed (`pipx install uv` or `brew install uv`).
+
+You can test the server directly in your terminal:
+
+```bash
+# Make sure MEM0_API_KEY is set in your environment
+export MEM0_API_KEY="your-mem0-api-key-here"
+
+# Run the server using uvx
+uvx git+https://github.com/ryaker/mcp-mem0-general.git mcp-mem0-general
 ```
-mem0_mcp_server/
-├── core/                   # Core functionality
-│   ├── client.py           # Mem0 client initialization 
-│   ├── logging.py          # Logging configuration
-│   └── server.py           # MCP server setup
-├── operations/             # Basic memory operations
-│   └── basic.py            # Add, search, get, delete, update
-├── memory_types/           # Specialized memory implementations
-│   ├── short_term.py       # Conversation, working, attention
-│   └── specialized.py      # Episodic, semantic, procedural
-└── advanced/               # Advanced features
-    ├── features.py         # Categories, instructions, graph, feedback
-    └── selective.py        # Pattern-based memory filtering
 
-app.py                      # Main entry point
-```
-
-## Getting Started
+The server should start and log its initialization steps.
 
 ### Setting up in Cursor or Claude Desktop
 
-1. Install the package:
+1.  **Find `uvx` Path:** GUI applications like Claude Desktop often don't use the same `PATH` as your terminal. Find the full path to your `uvx` executable by running this in your terminal:
+    ```bash
+    which uvx
+    ```
+    Copy the output path (e.g., `/Users/yourname/.local/bin/uvx` or `/opt/homebrew/bin/uvx`).
 
-```bash
-pip install mcp-mem0-server
-```
+2.  **Configure MCP:** Add the following configuration to your MCP configuration file, **replacing `/full/path/to/uvx`** with the actual path you found in step 1.
 
-2. Add the following configuration to your MCP configuration file:
+    *   **Cursor:** Add/update in `~/.cursor/mcp.json`:
+    *   **Claude Desktop:** Add/update a similar configuration in your settings.
 
-For Cursor, add this to `~/.cursor/mcp.json`:
-```json
-"mem0-memory-general": {
-  "command": "mcp-mem0-server",
-  "args": [],
-  "env": {
-    "MEM0_API_KEY": "your-mem0-api-key-here"
-  }
-}
-```
+    ```json
+    "mem0-memory-general": {
+      "command": "/full/path/to/uvx", # <-- IMPORTANT: Use the full path from 'which uvx'
+      "args": [
+        "git+https://github.com/ryaker/mcp-mem0-general.git",
+        "mcp-mem0-general"
+      ],
+      "env": {
+        "MEM0_API_KEY": "your-mem0-api-key-here"
+      }
+    }
+    ```
 
-For Claude Desktop, add a similar configuration in your settings.
+3.  **Restart:** Restart Cursor or Claude Desktop to apply the changes. The server should now start correctly within the application.
 
-3. Restart Cursor or Claude Desktop to apply the changes.
+### Note on `mem0ai[neo4j]` Warning
+
+You might see a warning like `warning: The package mem0ai==0.1.96 does not have an extra named neo4j` during startup.
+
+*   **If using the managed Mem0.ai platform:** This warning can be safely ignored. The necessary graph processing happens server-side on the Mem0 platform.
+*   **If self-hosting Mem0 with Neo4j:** This warning indicates that the specific `mem0ai` version didn't automatically install Neo4j-related Python libraries (`langchain-neo4j`, `neo4j`). You would need to ensure these are installed manually in your self-hosted environment if using graph features.
 
 ## Memory Types
 
@@ -105,5 +115,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [Mem0.ai](https://mem0.ai) for their excellent memory API
-- [FastMCP](https://github.com/anthropics/fastMCP) for the MCP server implementation
+- [Model Context Protocol](https://modelcontextprotocol.io/) (and its Python SDK `mcp`) for the server implementation
 - All contributors to this project 
