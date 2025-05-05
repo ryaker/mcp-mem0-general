@@ -98,11 +98,11 @@ Please search my memories for user_id "default_user" using the query "Mem0 MCP U
 
     The assistant should use the `mem0_search_memory` tool and provide you with an ID string (e.g., `76100ac4-896e-488b-90ad-036c0dfaaa80`). **Note down this ID!**
 
-4.  **Retrieve the Guide Later:** Now that you have the ID, you can quickly ask your assistant to recall the full guide anytime:
+4.  **Retrieve the Guide Later:** Now that you have the ID, you can quickly ask your assistant to recall the full guide anytime using a prompt like this:
 
     ```
-Retrieve memory ID *your-guide-id-here* using mem0_get_memory_by_id.
-```
+    First execute Retrieve memory ID *your-guide-id-here* using mem0_get_memory_by_id. Then return control to me.
+    ```
 
     (Replace *`your-guide-id-here`* with the actual ID you noted down in step 3).
 
