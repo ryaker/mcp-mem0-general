@@ -14,7 +14,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "fastapi>=0.100.0", # Added explicitly, though MCP SDK might pull it in
     "uvicorn[standard]>=0.20.0", # Added for running the server
-    "mem0ai[neo4j]>=0.3.5", # Includes base mem0, qdrant_client, openai, langchain-neo4j, neo4j, rank_bm25, certifi
+    "mem0ai[neo4j]>=0.1.86,<0.2.0", # Allows versions from 0.1.86 up to (but not including) 0.2.0
     "rank-bm25>=0.2.2", # Re-added explicitly just in case, though neo4j extra should cover it
     "certifi>=2023.7.22", # Re-added explicitly just in case
 ]
