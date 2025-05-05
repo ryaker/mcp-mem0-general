@@ -5,35 +5,28 @@ build-backend = "hatchling.build"
 [project]
 name = "mcp-mem0-general"
 version = "0.1.0"
-requires-python = ">=3.10"
-dependencies = [
-    "mem0ai[neo4j]>=0.1.21",
-    "fastmcp>=1.0.0",
-    "python-dotenv",
-    "openai>=1.0.0,<2.0.0",
-    "rank-bm25",
-    "certifi",
-]
-# Optional: Add description, authors etc.
-description = "MCP Server for general mem0 memory access"
+description = "MCP server for general Mem0 interactions (add/search/get/update/delete)."
 authors = [
-    { name="Your Name", email="your@email.com" }, # Add your details
+    {name = "Your Name", email = "your@email.com"}, # TODO: Update author info
 ]
+dependencies = [
+    "modelcontextprotocol>=0.1.0",
+    "python-dotenv>=1.0.0",
+    "fastapi>=0.100.0", # Added explicitly, though MCP SDK might pull it in
+    "uvicorn[standard]>=0.20.0", # Added for running the server
+    "mem0ai[neo4j]>=0.3.5", # Includes base mem0, qdrant_client, openai, langchain-neo4j, neo4j, rank_bm25, certifi
+    "rank-bm25>=0.2.2", # Re-added explicitly just in case, though neo4j extra should cover it
+    "certifi>=2023.7.22", # Re-added explicitly just in case
+]
+readme = "README.md"
+requires-python = ">=3.9,<4.0" # Adjusted python range slightly based on common practice
 
 # Define scripts as a separate table
 [project.scripts]
-mcp-mem0-server = "main:start_server"
+mcp-mem0-general = "mcp_mem0_general.main:start_server"
 
 [tool.hatch.build.targets.wheel]
-# Define what constitutes the package to be installed
-# For a single file, we might need to adjust this slightly.
-# Let's assume main.py acts as the package content for now.
-# Check hatch docs if install fails. We need to make sure `main.py`
-# is importable after installation.
-# A better structure would be src/mcp_mem0_general/main.py
-# and reference packages = ["src/mcp_mem0_general"]
-# For now, let's try including the module directly:
-include = ["/main.py"]
+packages = ["src/mcp_mem0_general"]
 
 [tool.uv.sources]
 mem0-mcp = { path = ".", editable = true }
