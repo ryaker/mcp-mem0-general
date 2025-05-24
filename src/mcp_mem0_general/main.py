@@ -164,6 +164,86 @@ def setup_server():
             return {"status": "error", "message": str(e)}
 
     @mcp.tool()
+    async def mem0_add_memory_direct(
+        text: str,
+        user_id: str,  # Now required
+        agent_id: str = "",  # Required with default
+        run_id: str = "",  # Required with default
+        metadata: dict = {},  # Already fixed: required, defaults to empty dict
+        enable_graph: bool = False,
+        includes: str = "",  # Required with default
+        excludes: str = "",  # Required with default
+        timestamp: int = 0,  # Required with default
+        expiration_date: str = "",  # Required with default
+    ) -> dict:
+        """Adds a memory to Mem0 directly, bypassing inference. Requires user_id.
+        Parameters like agent_id, run_id, metadata, includes, excludes, timestamp, expiration_date have defaults if not provided.
+        Set enable_graph=True to activate graph processing.
+        Provide 'includes' or 'excludes' string to filter stored memories.
+        Provide 'timestamp' (Unix timestamp integer) to set a custom creation time (default 0 ignored).
+        Provide 'expiration_date' (ISO 8601 string) to set an expiration (default "" ignored).
+        This version calls mem0_instance.add() with infer=False."""
+        
+        logging.info(f"Add direct request: user={user_id}, agent={agent_id}, run={run_id}, metadata={metadata} (type: {type(metadata)}), enable_graph={enable_graph}, includes='{includes}', excludes='{excludes}', timestamp={timestamp}, expiration_date={expiration_date}, text='{text[:50]}...'") 
+        
+        if not mem0_instance:
+            logging.error("Mem0 instance not initialized.")
+            return {"status": "error", "message": "Mem0 instance failed to initialize."}
+        
+        try:
+            add_args = {"user_id": user_id, "infer": False} # Key change: infer=False
+            
+            # Add metadata if it's not the default empty dictionary
+            if metadata: 
+                if isinstance(metadata, dict):
+                    add_args["metadata"] = metadata
+                    logging.info(f"Adding provided metadata: {metadata}")
+                else:
+                    logging.warning(f"Received metadata is not a dictionary (type: {type(metadata)}), discarding: {metadata}")
+            else:
+                logging.info("No metadata provided or metadata is empty, skipping.")
+
+            # --- Apply workaround for other originally optional parameters ---
+            if agent_id: # Check if not default ""
+                add_args["agent_id"] = agent_id
+                logging.info(f"Using agent_id: {agent_id}")
+            if run_id: # Check if not default ""
+                add_args["run_id"] = run_id
+                logging.info(f"Using run_id: {run_id}")
+            if timestamp != 0: # Check if not default 0
+                add_args["timestamp"] = timestamp
+                logging.info(f"Using custom timestamp: {timestamp}")
+            if includes: # Check if not default ""
+                add_args["includes"] = includes
+                logging.info(f"Adding 'includes' filter: {includes}")
+            if excludes: # Check if not default ""
+                add_args["excludes"] = excludes
+                logging.info(f"Adding 'excludes' filter: {excludes}")
+            if expiration_date: # Check if not default ""
+                add_args["expiration_date"] = expiration_date
+                logging.info(f"Setting expiration date: {expiration_date}")
+                
+            # --- Graph handling ---
+            if enable_graph:
+                add_args["enable_graph"] = True
+                add_args["output_format"] = "v1.1" 
+                add_args["version"] = "v2" 
+                logging.info(f"Calling mem0_instance.add (GRAPH ENABLED, v2, INFER=FALSE) with args: {add_args}")
+            else:
+                 add_args["version"] = "v2" 
+                 logging.info(f"Calling mem0_instance.add (GRAPH DISABLED, v2, INFER=FALSE) with args: {add_args}")
+
+            message_list = [{"role": "user", "content": text}] 
+            response = await mem0_instance.add(message_list, **add_args) 
+            
+            logging.info(f"Mem0 add direct response: {response}")
+            return {"status": "success", "details": response} 
+        except Exception as e:
+            logging.error(f"Error adding memory directly: {e}")
+            logging.error(traceback.format_exc())
+            return {"status": "error", "message": str(e)}
+
+    @mcp.tool()
     async def mem0_search_memory(
         query: str,
         user_id: str,  # Now required
