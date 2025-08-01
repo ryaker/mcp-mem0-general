@@ -17,7 +17,17 @@ This server provides MCP-compatible tools that let any compatible AI assistant a
 
 The project code is located within the `src/mcp_mem0_general/` directory.
 
-## Getting Started (No Installation Needed!)
+## Installation Methods
+
+### Method 1: DXT Extension (Recommended - Coming Soon)
+
+The easiest way to install this MCP server will be using the DXT extension format once Claude Desktop supports it.
+
+**Download**: [`mem0-mcp-server-0.1.0.dxt`](releases/mem0-mcp-server-0.1.0.dxt)
+
+For detailed DXT installation instructions, see [CLAUDE_DESKTOP_INSTALL.md](CLAUDE_DESKTOP_INSTALL.md).
+
+### Method 2: Direct Installation (Current)
 
 This server can be run directly from GitHub using `uvx` without needing to clone the repository or install it locally.
 
@@ -37,7 +47,7 @@ uvx git+https://github.com/ryaker/mcp-mem0-general.git mcp-mem0-general
 
 The server should start and log its initialization steps.
 
-### Setting up in Cursor or Claude Desktop
+### Method 3: Manual Configuration in Claude Desktop/Cursor
 
 1.  **Find `uvx` Path:** GUI applications like Claude Desktop often don't use the same `PATH` as your terminal. Find the full path to your `uvx` executable by running this in your terminal:
     ```bash
@@ -64,6 +74,8 @@ The server should start and log its initialization steps.
     ```
 
 3.  **Restart:** Restart Cursor or Claude Desktop to apply the changes. The server should now start correctly within the application.
+
+For detailed Claude Desktop installation instructions and troubleshooting, see [CLAUDE_DESKTOP_INSTALL.md](CLAUDE_DESKTOP_INSTALL.md).
 
 ### Note on `mem0ai[neo4j]` Warning
 
