@@ -2,9 +2,9 @@
 
 This guide provides multiple ways to install the Mem0 MCP Server in Claude Desktop.
 
-## Method 1: DXT Extension (Recommended - Coming Soon)
+## Method 1: DXT Extension (Recommended)
 
-> **Note**: DXT extension support is coming to Claude Desktop. This will be the easiest installation method once available.
+This is the easiest installation method using Claude Desktop's built-in extension support.
 
 1. **Download the Extension**
    - Download `mem0-mcp-server-0.1.0.dxt` from the [releases](releases/) directory
@@ -13,17 +13,16 @@ This guide provides multiple ways to install the Mem0 MCP Server in Claude Deskt
 2. **Install in Claude Desktop**
    - Open Claude Desktop
    - Go to Settings → Extensions
-   - Click "Install Extension"
-   - Select the downloaded `.dxt` file
-   - Enter your `MEM0_API_KEY` when prompted
+   - Click "Install Extension" or drag and drop the `.dxt` file
+   - Enter your `MEM0_API_KEY` when prompted (get yours from [mem0.ai](https://mem0.ai))
 
 3. **Verify Installation**
    - Restart Claude Desktop
    - The Mem0 tools should now be available in your conversations
 
-## Method 2: Manual MCP Configuration (Current)
+## Method 2: Manual MCP Configuration (Alternative)
 
-Since DXT support isn't yet available in Claude Desktop, use this manual method:
+If you prefer manual configuration or need custom setup:
 
 ### Prerequisites
 

@@ -19,9 +19,9 @@ The project code is located within the `src/mcp_mem0_general/` directory.
 
 ## Installation Methods
 
-### Method 1: DXT Extension (Recommended - Coming Soon)
+### Method 1: DXT Extension (Recommended)
 
-The easiest way to install this MCP server will be using the DXT extension format once Claude Desktop supports it.
+The easiest way to install this MCP server is using the DXT extension format in Claude Desktop.
 
 **Download**: [`mem0-mcp-server-0.1.0.dxt`](releases/mem0-mcp-server-0.1.0.dxt)
 
