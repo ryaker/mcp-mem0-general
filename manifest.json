@@ -7,6 +7,15 @@
     "name": "Ryan Aker",
     "url": "https://github.com/ryaker/mcp-mem0-general"
   },
+  "user_config": {
+    "mem0_api_key": {
+      "type": "string",
+      "title": "Mem0 API Key",
+      "description": "Your API key from mem0.ai for accessing the memory service",
+      "sensitive": true,
+      "required": true
+    }
+  },
   "server": {
     "type": "python",
     "entry_point": "src/mcp_mem0_general/main.py",
@@ -14,7 +23,7 @@
       "command": "uvx",
       "args": ["git+https://github.com/ryaker/mcp-mem0-general.git", "mcp-mem0-general"],
       "env": {
-        "MEM0_API_KEY": ""
+        "MEM0_API_KEY": "${user_config.mem0_api_key}"
       }
     }
   }
